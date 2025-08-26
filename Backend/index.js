@@ -10,10 +10,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   "http://localhost:5173",
-//   "https://click2-hire-remote-job-platform.vercel.app",
-//   "https://click2-hire-remote-job-platform-click2hires-projects.vercel.app",
-//   "https://click2-hire-remote-job-platform-git-main-click2hires-projects.vercel.app",
-//   "https://click2-hire-remote-job-platform-r0iq7z4zu-click2hires-projects.vercel.app",
+  //   "https://click2-hire-remote-job-platform.vercel.app",
+  //   "https://click2-hire-remote-job-platform-click2hires-projects.vercel.app",
+  //   "https://click2-hire-remote-job-platform-git-main-click2hires-projects.vercel.app",
+  //   "https://click2-hire-remote-job-platform-r0iq7z4zu-click2hires-projects.vercel.app",
 ];
 const corsOptions = {
   origin: function (origin, callback) {
@@ -42,6 +42,11 @@ app.get("/", (req, res) => {
   res.json("Welcome to TripUp Backend Development!");
 });
 
+// for Authentication
+app.use("/api/authentication", require("./route/AuthenticationRoute/index"));
+
+// for Bill CRUD
+app.use("/api/bill", require("./route/BillRoutes/index"));
 // Server Listening
 app.listen(PORT, () => {
   console.log(`Server listening on PORT ${PORT} ⛳`);

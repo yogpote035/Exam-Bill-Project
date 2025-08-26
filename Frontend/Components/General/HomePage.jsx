@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 
 export default function HomePage() {
-  const { token, user } = useSelector((state) => state.auth);
+  const { token, user } = useSelector((state) => state.authentication);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,7 +19,7 @@ export default function HomePage() {
       {/* Welcome Section */}
       <div className="w-full max-w-4xl text-center mb-10">
         <h1 className="text-3xl font-bold text-slate-900">
-          Welcome back, {user.name || "User"} 👋
+          Welcome back, {user?.name || "User"} 👋
         </h1>
         <p className="text-slate-600 mt-2">
           You are logged in as <span className="font-medium">{user.role}</span>
@@ -30,7 +30,7 @@ export default function HomePage() {
       <div className="w-full max-w-4xl grid md:grid-cols-3 gap-6">
         <div className="bg-white rounded-2xl shadow-md p-6 flex flex-col items-center">
           <img
-            src={user.profilePhoto || "https://via.placeholder.com/100"}
+            src={user.profileImage || "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=1024x1024&w=is&k=20&c=oGqYHhfkz_ifeE6-dID6aM7bLz38C6vQTy1YcbgZfx8="}
             alt="Profile"
             className="w-24 h-24 rounded-full border object-cover"
           />

@@ -1,23 +1,35 @@
 import React, { useMemo, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { signup } from "../../AllStateContainer/Authentication/AuthenticationSlice"; // import thunk
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function Signup() {
-  const [role, setRole] = useState("teacher"); 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [role, setRole] = useState("teacher");
   const [submitting, setSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const fileRef = useRef(null);
-
+  const { error } = useSelector((state) => state.authentication);
   const [form, setForm] = useState({
     name: "",
     email: "",
-    number: "",
+    mobileNumber: "",
     teacherId: "",
+    department: "",
     password: "",
     photo: null,
     showPassword: false,
   });
-
+  const isAuthenticated = useSelector(
+    (state) => state.authentication.isAuthenticated
+  );
   const errors = useMemo(() => validate(form, role), [form, role]);
-  const passwordStrength = useMemo(() => getPasswordStrength(form.password), [form.password]);
+  const passwordStrength = useMemo(
+    () => getPasswordStrength(form.password),
+    [form.password]
+  );
 
   function onChange(e) {
     const { name, value, files } = e.target;
@@ -37,53 +49,45 @@ export default function Signup() {
   async function onSubmit(e) {
     e.preventDefault();
     if (!isFormValid(errors)) return;
+    setSubmitting(true);
+    const fd = new FormData();
+    fd.append("role", role);
+    fd.append("name", form.name.trim());
+    fd.append("email", form.email.trim());
+    fd.append("mobileNumber", form.mobileNumber.trim()); // matches backend schema
+    fd.append("password", form.password);
 
-    try {
-      setSubmitting(true);
+    fd.append("teacherId", form.teacherId.trim());
+    fd.append("department", form.department);
+    if (form.photo) fd.append("profileImage", form.photo);
+    console.log("as Teacher");
+    dispatch(signup(fd), navigate);
 
-      // Build FormData for backend (works for photo uploads)
-      const fd = new FormData();
-      fd.append("role", role);
-      fd.append("name", form.name.trim());
-      fd.append("email", form.email.trim());
-      fd.append("number", form.number.trim());
-      fd.append("password", form.password);
-      if (role === "teacher") {
-        fd.append("teacherId", form.teacherId.trim());
-        if (form.photo) fd.append("photo", form.photo);
-      }
-
-      // TODO: replace with your API call, e.g. fetch('/api/auth/signup', { method: 'POST', body: fd })
-      await fakeNetwork(fd);
-
-      alert(`Signed up successfully as ${role}!`);
-      // Reset form
-      setForm({ name: "", email: "", number: "", teacherId: "", password: "", photo: null, showPassword: false });
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-      setPreviewUrl(null);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to sign up. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+    setSubmitting(false);
   }
-
+  useEffect(() => {
+    if (isAuthenticated === "true") {
+      navigate("/");
+    }
+  }, [isAuthenticated]);
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl">
-        {/* Card */}
-        <div className="bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+    <div className="outline-none focus:outline-none min-h-screen w-full bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+      <div className="outline-none focus:outline-none w-full max-w-2xl">
+        <div className="outline-none focus:outline-none bg-white rounded-2xl shadow-xl border overflow-hidden">
           {/* Header */}
-          <div className="p-6 border-b border-slate-200 flex items-center justify-between gap-4">
+          <div className="outline-none focus:outline-none p-6 border-b flex items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold text-slate-800">Create Account</h1>
-              <p className="text-sm text-slate-500">Sign up as a Teacher or Admin</p>
+              <h1 className="outline-none focus:outline-none text-2xl font-semibold">
+                Create Account
+              </h1>
+              <p className="outline-none focus:outline-none text-sm text-slate-500">
+                Sign up as {role === "teacher" ? "Teacher" : "Admin"}
+              </p>
             </div>
-
-            {/* Role Toggle */}
-            <div className="bg-slate-100 p-1 rounded-full flex items-center gap-1">
-              {(["teacher", "admin"]).map((r) => (
+            <div className="outline-none focus:outline-none bg-slate-100 p-1 rounded-full flex items-center gap-1">
+              {["teacher", "admin"].map((r) => (
                 <button
                   key={r}
                   type="button"
@@ -91,7 +95,7 @@ export default function Signup() {
                   className={
                     "px-4 py-2 rounded-full text-sm font-medium transition " +
                     (role === r
-                      ? "bg-white shadow text-slate-900"
+                      ? "bg-white shadow"
                       : "text-slate-600 hover:text-slate-900")
                   }
                   aria-pressed={role === r}
@@ -103,98 +107,119 @@ export default function Signup() {
           </div>
 
           {/* Body */}
-          <form onSubmit={onSubmit} className="p-6 grid md:grid-cols-2 gap-4">
+          <form
+            onSubmit={onSubmit}
+            className="outline-none focus:outline-none p-6 grid md:grid-cols-2 gap-4"
+          >
             {/* Name */}
-            <div className="md:col-span-2">
-              <Label htmlFor="name">{role === "teacher" ? "Teacher Name" : "Name"} <span className="text-rose-600">*</span></Label>
+            <div className="outline-none focus:outline-none md:col-span-2">
+              <Label htmlFor="name">
+                {role === "teacher" ? "Teacher Name" : "Name"} *
+              </Label>
               <Input
                 id="name"
                 name="name"
-                placeholder="Enter full name"
                 value={form.name}
                 onChange={onChange}
-                aria-invalid={!!errors.name}
               />
               <FieldError message={errors.name} />
             </div>
-
             {/* Email */}
             <div>
-              <Label htmlFor="email">Email <span className="text-rose-600">*</span></Label>
+              <Label htmlFor="email">Email *</Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="name@example.com"
                 value={form.email}
                 onChange={onChange}
-                aria-invalid={!!errors.email}
               />
-              <Hint text="Must be unique for each account" />
               <FieldError message={errors.email} />
             </div>
-
-            {/* Number */}
+            {/* Mobile Number */}
             <div>
-              <Label htmlFor="number">Number <span className="text-rose-600">*</span></Label>
+              <Label htmlFor="mobileNumber">Mobile Number *</Label>
               <Input
-                id="number"
-                name="number"
-                inputMode="tel"
-                placeholder="10-digit mobile number"
-                value={form.number}
+                id="mobileNumber"
+                name="mobileNumber"
+                value={form.mobileNumber}
                 onChange={onChange}
-                aria-invalid={!!errors.number}
               />
-              <Hint text="Must be unique for each account" />
-              <FieldError message={errors.number} />
+              <FieldError message={errors.mobileNumber} />
             </div>
-
-            {/* Teacher ID (Teacher only) */}
+            {/* Teacher ID */}
             {role === "teacher" && (
               <div>
-                <Label htmlFor="teacherId">Teacher ID <span className="text-rose-600">*</span></Label>
+                <Label htmlFor="teacherId">Teacher ID *</Label>
                 <Input
                   id="teacherId"
                   name="teacherId"
-                  placeholder="e.g., TCH-2025-001"
                   value={form.teacherId}
                   onChange={onChange}
-                  aria-invalid={!!errors.teacherId}
                 />
-                <Hint text="Must be unique for each teacher" />
                 <FieldError message={errors.teacherId} />
               </div>
             )}
-
-            {/* Profile Photo (Teacher only) */}
+            {/* Department */}
             {role === "teacher" && (
-              <div className="md:col-span-2">
-                <Label>Profile Photo (optional)</Label>
-                <div className="flex items-center gap-4 mt-2">
-                  <div className="w-20 h-20 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center">
+              <div>
+                <Label htmlFor="department">Department *</Label>
+                <select
+                  id="department"
+                  name="department"
+                  value={form.department}
+                  onChange={onChange}
+                  className="outline-none focus:outline-none w-full rounded border px-3 py-2 text-sm"
+                >
+                  <option value="">Select Department</option>
+                  <option value="Computer Science">Computer Science</option>
+                  <option value="Biotech">Biotech</option>
+                  <option value="Commerce">Commerce</option>
+                  <option value="Arts">Arts</option>
+                  <option value="Sociology">Sociology</option>
+                  <option value="BBA">BBA</option>
+                  <option value="BBA-CA">BBA-CA</option>
+                  <option value="Law">Law</option>
+                  <option value="Chemistry">Chemistry</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="BCA">BCA</option>
+                </select>
+                <FieldError message={errors.department} />
+              </div>
+            )}
+            {/* Profile Photo */}
+            {role === "teacher" && (
+              <div className="outline-none focus:outline-none md:col-span-2">
+                <Label>Profile Photo</Label>
+                <div className="outline-none focus:outline-none flex items-center gap-4 mt-2">
+                  <div className="outline-none focus:outline-none w-20 h-20 rounded bg-slate-100 border flex items-center justify-center">
                     {previewUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                      <img
+                        src={previewUrl}
+                        alt="Preview"
+                        className="outline-none focus:outline-none w-full h-full object-cover"
+                      />
                     ) : (
-                      <span className="text-xs text-slate-400">No photo</span>
+                      <span className="outline-none focus:outline-none text-xs text-slate-400">
+                        No photo
+                      </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="outline-none focus:outline-none flex items-center gap-2">
                     <input
                       ref={fileRef}
                       type="file"
                       name="photo"
                       accept="image/*"
                       onChange={onChange}
-                      className="hidden"
+                      className="outline-none focus:outline-none hidden"
                     />
                     <button
                       type="button"
                       onClick={() => fileRef.current?.click()}
-                      className="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm hover:bg-slate-800 active:scale-[.98]"
+                      className="outline-none focus:outline-none px-4 py-2 rounded bg-slate-900 text-white text-sm"
                     >
-                      Upload Photo
+                      Upload
                     </button>
                     {previewUrl && (
                       <button
@@ -205,7 +230,7 @@ export default function Signup() {
                           setForm((s) => ({ ...s, photo: null }));
                           if (fileRef.current) fileRef.current.value = "";
                         }}
-                        className="px-3 py-2 rounded-xl border text-sm"
+                        className="outline-none focus:outline-none px-3 py-2 rounded border text-sm"
                       >
                         Remove
                       </button>
@@ -214,25 +239,23 @@ export default function Signup() {
                 </div>
               </div>
             )}
-
             {/* Password */}
-            <div className="md:col-span-2">
-              <Label htmlFor="password">Password <span className="text-rose-600">*</span></Label>
-              <div className="relative">
+            <div className="outline-none focus:outline-none md:col-span-2">
+              <Label htmlFor="password">Password *</Label>
+              <div className="outline-none focus:outline-none relative">
                 <Input
                   id="password"
                   name="password"
                   type={form.showPassword ? "text" : "password"}
-                  placeholder="Minimum 8 characters"
                   value={form.password}
                   onChange={onChange}
-                  aria-invalid={!!errors.password}
                 />
                 <button
                   type="button"
-                  onClick={() => setForm((s) => ({ ...s, showPassword: !s.showPassword }))}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-xs px-2 py-1 border rounded-md"
-                  aria-label={form.showPassword ? "Hide password" : "Show password"}
+                  onClick={() =>
+                    setForm((s) => ({ ...s, showPassword: !s.showPassword }))
+                  }
+                  className="outline-none focus:outline-none absolute right-2 top-1/2 -translate-y-1/2 text-xs px-2 py-1 border rounded-md"
                 >
                   {form.showPassword ? "Hide" : "Show"}
                 </button>
@@ -240,121 +263,96 @@ export default function Signup() {
               <FieldError message={errors.password} />
               <PasswordMeter strength={passwordStrength} />
             </div>
-
             {/* Submit */}
-            <div className="md:col-span-2 flex items-center justify-between gap-3 pt-2">
-              <p className="text-xs text-slate-500">By continuing, you agree to our Terms & Privacy Policy.</p>
+            <div className="outline-none focus:outline-none md:col-span-2 flex justify-end pt-2">
               <button
                 type="submit"
                 disabled={submitting || !isFormValid(errors)}
-                className="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="outline-none focus:outline-none px-5 py-2 rounded bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-50"
               >
-                {submitting ? "Creating..." : `Create ${role === "teacher" ? "Teacher" : "Admin"} Account`}
+                {submitting
+                  ? "Creating..."
+                  : `Create ${
+                      role === "teacher" ? "Teacher" : "Admin"
+                    } Account`}
               </button>
             </div>
-
-            {/* Helper: unique constraints note */}
-            <div className="md:col-span-2 text-[11px] text-slate-500 border-t pt-3">
-              <p><strong>Uniqueness</strong>: Email, Number, and {role === "teacher" ? "Teacher ID" : "—"} must be unique. The app should enforce this on the backend with database unique indexes and return a clear error if duplicates are found.</p>
-            </div>
+            {error && (
+              <p className="text-rose-500">
+                <span className="text-gray-800">Error:</span>
+                {error}
+              </p>
+            )}{" "}
           </form>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-4 text-sm text-slate-600">
-          Already have an account? <a href="#" className="underline underline-offset-4">Log in</a>
         </div>
       </div>
     </div>
   );
 }
 
-// ————— Helper Components —————
+// ---- helpers ----
 function Label({ children, htmlFor }) {
   return (
-    <label htmlFor={htmlFor} className="block text-sm font-medium text-slate-700 mb-1">
+    <label
+      htmlFor={htmlFor}
+      className="outline-none focus:outline-none block text-sm font-medium mb-1"
+    >
       {children}
     </label>
   );
 }
-
 function Input(props) {
   return (
     <input
       {...props}
-      className={(props.className ?? "") +
-        " w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring-4 focus:ring-slate-200"}
+      className="outline-none focus:outline-none w-full rounded border px-3 py-2 text-sm"
     />
   );
 }
-
-function Hint({ text }) {
-  return <p className="text-[11px] text-slate-500 mt-1">{text}</p>;
-}
-
 function FieldError({ message }) {
   if (!message) return null;
-  return <p className="text-xs text-rose-600 mt-1">{message}</p>;
+  return (
+    <p className="outline-none focus:outline-none text-xs text-rose-600 mt-1">
+      {message}
+    </p>
+  );
 }
-
 function PasswordMeter({ strength }) {
   const stages = ["Weak", "Fair", "Good", "Strong"];
-  const pct = (strength / 3) * 100; // 0..3
+  const pct = (strength / 3) * 100;
   return (
-    <div className="mt-2">
-      <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
-        <div className="h-full bg-slate-900 transition-all" style={{ width: `${pct}%` }} />
+    <div className="outline-none focus:outline-none mt-2">
+      <div className="outline-none focus:outline-none h-2 w-full bg-slate-200 rounded-full">
+        <div
+          className="outline-none focus:outline-none h-full bg-slate-900"
+          style={{ width: `${pct}%` }}
+        />
       </div>
-      <p className="text-[11px] text-slate-500 mt-1">Password strength: {stages[strength]}</p>
+      <p className="outline-none focus:outline-none text-[11px] mt-1">
+        Password strength: {stages[strength]}
+      </p>
     </div>
   );
 }
-
-// ————— Validation & Utils —————
 function validate(form, role) {
   const errs = {};
-
-  // Name
-  if (!form.name.trim()) errs.name = "Name is required";
-  else if (form.name.trim().length < 2) errs.name = "Enter a valid name";
-
-  // Email
-  if (!form.email.trim()) errs.email = "Email is required";
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) errs.email = "Enter a valid email";
-
-  // Number (10 digits typical in India)
-  const number = form.number.trim();
-  if (!number) errs.number = "Number is required";
-  else if (!/^\d{10}$/.test(number)) errs.number = "Enter a 10-digit mobile number";
-
-  if (role === "teacher") {
-    // Teacher ID
-    if (!form.teacherId.trim()) errs.teacherId = "Teacher ID is required";
-    else if (!/^[A-Za-z0-9_-]{3,}$/.test(form.teacherId.trim())) errs.teacherId = "Use letters, numbers, - or _ (min 3 chars)";
-  }
-
-  // Password
-  if (!form.password) errs.password = "Password is required";
-  else if (form.password.length < 8) errs.password = "Must be at least 8 characters";
-  else if (!/[A-Z]/.test(form.password) || !/[a-z]/.test(form.password) || !/\d/.test(form.password)) {
-    errs.password = "Include upper, lower, and a number";
-  }
-
+  if (!form.name.trim()) errs.name = "Name required";
+  if (!form.email.trim()) errs.email = "Email required";
+  if (!form.mobileNumber.trim()) errs.mobileNumber = "Mobile number required";
+  if (role === "teacher" && !form.teacherId.trim())
+    errs.teacherId = "Teacher ID required";
+  if (role === "teacher" && !form.department)
+    errs.department = "Department required";
+  if (!form.password) errs.password = "Password required";
   return errs;
 }
-
 function isFormValid(errs) {
   return Object.keys(errs).length === 0;
 }
-
 function getPasswordStrength(pw) {
   let score = 0;
   if (pw.length >= 8) score++;
   if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
   if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) score++;
-  return score; // 0..3
-}
-
-function fakeNetwork(fd) {
-  return new Promise((res) => setTimeout(res, 600));
+  return score;
 }
