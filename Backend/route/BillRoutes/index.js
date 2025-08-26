@@ -13,6 +13,7 @@ router.post(
 
 // Get all bills
 router.get("/", VerifyToken, billController.getBills);
+router.get("/download/:id", VerifyToken, billController.downloadBill);
 
 // Get single bill
 router.get("/:id", VerifyToken, billController.getBillById);

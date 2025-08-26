@@ -1,6 +1,9 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBillById } from "../../AllStateContainer/Bill/BillSlice";
+import {
+  downloadBill,
+  fetchBillById,
+} from "../../AllStateContainer/Bill/BillSlice";
 import { format } from "date-fns";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Edit, Printer } from "lucide-react";
@@ -74,6 +77,13 @@ export default function ViewBill() {
           >
             <Printer className="h-5 w-5 mr-2" />
             Print Bill
+          </button>
+          <button
+            onClick={() => dispatch(downloadBill(currentBill._id))}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center"
+          >
+            <Printer className="h-5 w-5 mr-2" />
+            Download Bill
           </button>
         </div>
       </div>
@@ -207,9 +217,10 @@ export default function ViewBill() {
                       </td>
                       <td className="border border-gray-300 px-3 py-2 text-center">
                         {currentBill.presentStudents} (Present Students)
-                        <span className="text-rose-500">{" "} X</span> {" "}₹{person.rate}
-                        (Rate Per Student) <span className="text-rose-500">{" "} + </span> {" "}{person.extraAllowance}(Extra Allowance
-)
+                        <span className="text-rose-500"> X</span> ₹{person.rate}
+                        (Rate Per Student){" "}
+                        <span className="text-rose-500"> + </span>{" "}
+                        {person.extraAllowance}(Extra Allowance )
                       </td>
                       <td className="border border-gray-300 px-3 py-2 text-center">
                         ₹{person.totalAmount}
