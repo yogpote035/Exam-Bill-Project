@@ -116,7 +116,7 @@ exports.getProfile = async (req, res) => {
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
-    user: process.env.EMAIL,
+    user: process.env.Email,
     pass: process.env.Email_Password,
   },
 });
@@ -143,7 +143,7 @@ exports.sendOtp = async (req, res) => {
 
     // Send email
     await transporter.sendMail({
-      from: process.env.EMAIL,
+      from: process.env.Email,
       to: email,
       subject: "Your OTP Code",
       text: `Your OTP code is: ${otp} (valid for 10 minutes)`,

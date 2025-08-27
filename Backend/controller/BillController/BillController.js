@@ -789,14 +789,14 @@ const mailMainBillSelf = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL,
+        user: process.env.Email,
         pass: process.env.Email_Password,
       },
     });
 
     // Email options
     const mailOptions = {
-      from: process.env.EMAIL,
+      from: process.env.Email,
       to: userEmail,
       subject: `Main Bill - ${bill.subject} - ${formattedDate}`,
       text: `Please find attached the main bill for ${bill.subject} examination held on ${formattedDate}.`,
@@ -1002,14 +1002,14 @@ const mailMainBillOther = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL,
+        user: process.env.Email,
         pass: process.env.Email_Password,
       },
     });
 
     // Email options
     const mailOptions = {
-      from: process.env.EMAIL,
+      from: process.env.Email,
       to: email,
       subject: `Main Bill - ${bill.subject} - ${formattedDate}`,
       text: `Please find attached the main bill for ${bill.subject} examination held on ${formattedDate}.`,
@@ -1612,14 +1612,14 @@ const mailPersonalBillsSelf = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL,
+        user: process.env.Email,
         pass: process.env.Email_Password,
       },
     });
 
     // Email options
     const mailOptions = {
-      from: process.env.EMAIL,
+      from: process.env.Email,
       to: userEmail,
       subject: `Personal Bills - ${bill.subject} - ${formattedDate}`,
       text: `Please find attached the personal bills for ${bill.subject} examination held on ${formattedDate}.`,
@@ -1938,14 +1938,14 @@ const mailPersonalBillsOther = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL,
+        user: process.env.Email,
         pass: process.env.Email_Password,
       },
     });
 
     // Email options
     const mailOptions = {
-      from: process.env.EMAIL,
+      from: process.env.Email,
       to: email,
       subject: `Personal Bills - ${bill.subject} - ${formattedDate}`,
       text: `Please find attached the personal bills for ${bill.subject} examination held on ${formattedDate}.`,
