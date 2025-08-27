@@ -1,8 +1,7 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { signup } from "../../AllStateContainer/Authentication/AuthenticationSlice"; // import thunk
+import { signup } from "../../AllStateContainer/Authentication/AuthenticationSlice";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
 export default function Signup() {
   const dispatch = useDispatch();
@@ -12,6 +11,10 @@ export default function Signup() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const fileRef = useRef(null);
   const { error } = useSelector((state) => state.authentication);
+  const isAuthenticated = useSelector(
+    (state) => state.authentication.isAuthenticated
+  );
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -22,9 +25,7 @@ export default function Signup() {
     photo: null,
     showPassword: false,
   });
-  const isAuthenticated = useSelector(
-    (state) => state.authentication.isAuthenticated
-  );
+
   const errors = useMemo(() => validate(form, role), [form, role]);
   const passwordStrength = useMemo(
     () => getPasswordStrength(form.password),
@@ -54,39 +55,52 @@ export default function Signup() {
     fd.append("role", role);
     fd.append("name", form.name.trim());
     fd.append("email", form.email.trim());
-    fd.append("mobileNumber", form.mobileNumber.trim()); // matches backend schema
+    fd.append("mobileNumber", form.mobileNumber.trim());
     fd.append("password", form.password);
-
     fd.append("teacherId", form.teacherId.trim());
     fd.append("department", form.department);
     if (form.photo) fd.append("profileImage", form.photo);
-    console.log("as Teacher");
+
     dispatch(signup(fd), navigate);
 
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(null);
     setSubmitting(false);
   }
+
   useEffect(() => {
     if (isAuthenticated === "true") {
       navigate("/");
     }
   }, [isAuthenticated]);
+
   return (
-    <div className="outline-none focus:outline-none min-h-screen w-full bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-      <div className="outline-none focus:outline-none w-full max-w-2xl">
-        <div className="outline-none focus:outline-none bg-white rounded-2xl shadow-xl border overflow-hidden">
-          {/* Header */}
-          <div className="outline-none focus:outline-none p-6 border-b flex items-center justify-between gap-4">
-            <div>
-              <h1 className="outline-none focus:outline-none text-2xl font-semibold">
-                Create Account
-              </h1>
-              <p className="outline-none focus:outline-none text-sm text-slate-500">
-                Sign up as {role === "teacher" ? "Teacher" : "Admin"}
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl">
+        <div className="bg-white rounded-2xl shadow-xl border overflow-hidden">
+          {/* Header with Logo */}
+          <div className="p-6 border-b flex flex-col items-center">
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiDX-TI_GWDRoSUoutAJU6HDoAwjH9sPY_PUd2yOYyYNdY6g6un5KNinkcCQmHdmuqIPg&usqp=CAU"
+              alt="College Logo"
+              className="w-20 h-20 mb-3"
+            />
+            <h1 className="text-2xl font-bold text-slate-900">
+              Staff Remuneration Signup
+            </h1>
+            {role === "teacher" && (
+              <p className="text-sm text-slate-500 mt-1 text-center">
+                Please create your account to access the Teacher portal
               </p>
-            </div>
-            <div className="outline-none focus:outline-none bg-slate-100 p-1 rounded-full flex items-center gap-1">
+            )}
+
+            {role === "admin" && (
+              <p className="text-sm text-slate-500 mt-1 text-center">
+                Please create your account to manage the Staff Remuneration
+                System
+              </p>
+            )}
+            <div className="bg-slate-100 mt-4 p-1 rounded-full flex items-center gap-1">
               {["teacher", "admin"].map((r) => (
                 <button
                   key={r}
@@ -106,13 +120,10 @@ export default function Signup() {
             </div>
           </div>
 
-          {/* Body */}
-          <form
-            onSubmit={onSubmit}
-            className="outline-none focus:outline-none p-6 grid md:grid-cols-2 gap-4"
-          >
+          {/* Form */}
+          <form onSubmit={onSubmit} className="p-6 grid md:grid-cols-2 gap-4">
             {/* Name */}
-            <div className="outline-none focus:outline-none md:col-span-2">
+            <div className="md:col-span-2">
               <Label htmlFor="name">
                 {role === "teacher" ? "Teacher Name" : "Name"} *
               </Label>
@@ -124,6 +135,7 @@ export default function Signup() {
               />
               <FieldError message={errors.name} />
             </div>
+
             {/* Email */}
             <div>
               <Label htmlFor="email">Email *</Label>
@@ -136,6 +148,7 @@ export default function Signup() {
               />
               <FieldError message={errors.email} />
             </div>
+
             {/* Mobile Number */}
             <div>
               <Label htmlFor="mobileNumber">Mobile Number *</Label>
@@ -147,6 +160,7 @@ export default function Signup() {
               />
               <FieldError message={errors.mobileNumber} />
             </div>
+
             {/* Teacher ID */}
             {role === "teacher" && (
               <div>
@@ -160,6 +174,7 @@ export default function Signup() {
                 <FieldError message={errors.teacherId} />
               </div>
             )}
+
             {/* Department */}
             {role === "teacher" && (
               <div>
@@ -169,7 +184,7 @@ export default function Signup() {
                   name="department"
                   value={form.department}
                   onChange={onChange}
-                  className="outline-none focus:outline-none w-full rounded border px-3 py-2 text-sm"
+                  className="w-full rounded border px-3 py-2 text-sm"
                 >
                   <option value="">Select Department</option>
                   <option value="Computer Science">Computer Science</option>
@@ -187,37 +202,36 @@ export default function Signup() {
                 <FieldError message={errors.department} />
               </div>
             )}
+
             {/* Profile Photo */}
             {role === "teacher" && (
-              <div className="outline-none focus:outline-none md:col-span-2">
+              <div className="md:col-span-2">
                 <Label>Profile Photo</Label>
-                <div className="outline-none focus:outline-none flex items-center gap-4 mt-2">
-                  <div className="outline-none focus:outline-none w-20 h-20 rounded bg-slate-100 border flex items-center justify-center">
+                <div className="flex items-center gap-4 mt-2">
+                  <div className="w-20 h-20 rounded bg-slate-100 border flex items-center justify-center">
                     {previewUrl ? (
                       <img
                         src={previewUrl}
                         alt="Preview"
-                        className="outline-none focus:outline-none w-full h-full object-cover"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="outline-none focus:outline-none text-xs text-slate-400">
-                        No photo
-                      </span>
+                      <span className="text-xs text-slate-400">No photo</span>
                     )}
                   </div>
-                  <div className="outline-none focus:outline-none flex items-center gap-2">
+                  <div className="flex items-center gap-2">
                     <input
                       ref={fileRef}
                       type="file"
                       name="photo"
                       accept="image/*"
                       onChange={onChange}
-                      className="outline-none focus:outline-none hidden"
+                      className="hidden"
                     />
                     <button
                       type="button"
                       onClick={() => fileRef.current?.click()}
-                      className="outline-none focus:outline-none px-4 py-2 rounded bg-slate-900 text-white text-sm"
+                      className="px-4 py-2 rounded bg-slate-900 text-white text-sm"
                     >
                       Upload
                     </button>
@@ -230,7 +244,7 @@ export default function Signup() {
                           setForm((s) => ({ ...s, photo: null }));
                           if (fileRef.current) fileRef.current.value = "";
                         }}
-                        className="outline-none focus:outline-none px-3 py-2 rounded border text-sm"
+                        className="px-3 py-2 rounded border text-sm"
                       >
                         Remove
                       </button>
@@ -239,10 +253,11 @@ export default function Signup() {
                 </div>
               </div>
             )}
+
             {/* Password */}
-            <div className="outline-none focus:outline-none md:col-span-2">
+            <div className="md:col-span-2">
               <Label htmlFor="password">Password *</Label>
-              <div className="outline-none focus:outline-none relative">
+              <div className="relative">
                 <Input
                   id="password"
                   name="password"
@@ -255,20 +270,25 @@ export default function Signup() {
                   onClick={() =>
                     setForm((s) => ({ ...s, showPassword: !s.showPassword }))
                   }
-                  className="outline-none focus:outline-none absolute right-2 top-1/2 -translate-y-1/2 text-xs px-2 py-1 border rounded-md"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-xs px-2 py-1 border rounded-md"
                 >
                   {form.showPassword ? "Hide" : "Show"}
                 </button>
               </div>
               <FieldError message={errors.password} />
               <PasswordMeter strength={passwordStrength} />
+              {/* Password Example */}
+              <p className="text-[11px] text-slate-500 mt-1">
+                Example: <span className="font-mono">Abc@1234</span>
+              </p>
             </div>
+
             {/* Submit */}
-            <div className="outline-none focus:outline-none md:col-span-2 flex justify-end pt-2">
+            <div className="md:col-span-2 flex justify-end pt-2">
               <button
                 type="submit"
                 disabled={submitting || !isFormValid(errors)}
-                className="outline-none focus:outline-none px-5 py-2 rounded bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-50"
+                className="px-5 py-2 rounded bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-50"
               >
                 {submitting
                   ? "Creating..."
@@ -278,11 +298,10 @@ export default function Signup() {
               </button>
             </div>
             {error && (
-              <p className="text-rose-500">
-                <span className="text-gray-800">Error:</span>
-                {error}
+              <p className="text-rose-500 text-sm">
+                <span className="text-gray-800"></span> {error}
               </p>
-            )}{" "}
+            )}
           </form>
         </div>
       </div>
@@ -293,44 +312,29 @@ export default function Signup() {
 // ---- helpers ----
 function Label({ children, htmlFor }) {
   return (
-    <label
-      htmlFor={htmlFor}
-      className="outline-none focus:outline-none block text-sm font-medium mb-1"
-    >
+    <label htmlFor={htmlFor} className="block text-sm font-medium mb-1">
       {children}
     </label>
   );
 }
 function Input(props) {
   return (
-    <input
-      {...props}
-      className="outline-none focus:outline-none w-full rounded border px-3 py-2 text-sm"
-    />
+    <input {...props} className="w-full rounded border px-3 py-2 text-sm" />
   );
 }
 function FieldError({ message }) {
   if (!message) return null;
-  return (
-    <p className="outline-none focus:outline-none text-xs text-rose-600 mt-1">
-      {message}
-    </p>
-  );
+  return <p className="text-xs text-rose-600 mt-1">{message}</p>;
 }
 function PasswordMeter({ strength }) {
   const stages = ["Weak", "Fair", "Good", "Strong"];
   const pct = (strength / 3) * 100;
   return (
-    <div className="outline-none focus:outline-none mt-2">
-      <div className="outline-none focus:outline-none h-2 w-full bg-slate-200 rounded-full">
-        <div
-          className="outline-none focus:outline-none h-full bg-slate-900"
-          style={{ width: `${pct}%` }}
-        />
+    <div className="mt-2">
+      <div className="h-2 w-full bg-slate-200 rounded-full">
+        <div className="h-full bg-slate-900" style={{ width: `${pct}%` }} />
       </div>
-      <p className="outline-none focus:outline-none text-[11px] mt-1">
-        Password strength: {stages[strength]}
-      </p>
+      <p className="text-[11px] mt-1">Password strength: {stages[strength]}</p>
     </div>
   );
 }

@@ -349,8 +349,11 @@ export default function UpdateBill() {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto mt-6 p-6 shadow-lg rounded-2xl bg-white">
+      <div className="max-w-6xl mx-auto mt-1 p-6 shadow-lg rounded-2xl bg-white">
         <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>{" "}
+        <div className="flex justify-center mt-3 items-center h-64">
           <p className="text-xl">Loading bill data...</p>
         </div>
       </div>
@@ -366,8 +369,6 @@ export default function UpdateBill() {
       </div>
     );
   }
-
-  console.log(currentBill);
 
   return (
     <div className="max-w-6xl mx-auto mt-6 p-6 shadow-lg rounded-2xl bg-white">
@@ -866,14 +867,14 @@ export default function UpdateBill() {
                   </div>
                   <div>
                     <label className="block text-xs font-medium mb-1">
-                      Extra
+                      Allowance
                     </label>
                     <input
                       type="number"
                       {...register(
                         `staffPayments.${sIndex}.persons.${pIndex}.extraAllowance`
                       )}
-                      placeholder="Extra"
+                      placeholder="Allowance"
                       className="border rounded px-2 py-1 w-full text-sm"
                     />
                   </div>

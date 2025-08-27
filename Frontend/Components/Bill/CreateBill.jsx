@@ -715,13 +715,13 @@ export default function CreateBill() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium mb-1">Extra</label>
+                    <label className="block text-xs font-medium mb-1">Allowance</label>
                     <input
                       type="number"
                       {...register(
                         `staffPayments.${sIndex}.persons.${pIndex}.extraAllowance`
                       )}
-                      placeholder="Extra"
+                      placeholder="Allowance"
                       className="border rounded px-2 py-1 w-full text-sm"
                     />
                   </div>

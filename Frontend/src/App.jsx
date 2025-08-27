@@ -24,7 +24,7 @@ function App() {
         }}
       />
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<ProtectedRoutes><AllBills /></ProtectedRoutes>} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         {/* create bill */}

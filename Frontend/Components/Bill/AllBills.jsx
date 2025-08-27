@@ -1,6 +1,11 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBills, deleteBill } from "../../AllStateContainer/Bill/BillSlice";
+import {
+  fetchBills,
+  deleteBill,
+  downloadBill,
+  downloadBankDetailForm,
+} from "../../AllStateContainer/Bill/BillSlice";
 import { format } from "date-fns";
 import {
   Eye,
@@ -10,6 +15,7 @@ import {
   ChevronUp,
   ChevronDown,
   Plus,
+  Download,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -128,13 +134,22 @@ export default function AllBills() {
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Staff Payment Bills</h1>
-        <button
-          onClick={() => navigate("/create-bill")}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center"
-        >
-          <Plus className="h-5 w-5 mr-2" />
-          Create New Bill
-        </button>
+        <div className="flex justify-between gap-2">
+          <button
+            onClick={() => navigate("/create-bill")}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Create New Bill
+          </button>
+          <button
+            onClick={() => dispatch(downloadBankDetailForm())}
+            className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-green-600 hover:to-blue-500 text-white px-4 py-2 rounded flex items-center"
+          >
+            <Download className="h-5 w-5 mr-2" />
+            Download Bank Detail Form
+          </button>{" "}
+        </div>
       </div>
 
       {/* Filters and Search */}
@@ -288,8 +303,8 @@ export default function AllBills() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {bill.createdAt &&
-                          format(new Date(bill.createdAt), "dd MMM yyyy")}
+                        {bill.examStartTime &&
+                          format(new Date(bill.examStartTime), "dd MMM yyyy")}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -300,6 +315,13 @@ export default function AllBills() {
                           title="View Details"
                         >
                           <Eye className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => dispatch(downloadBill(bill._id))}
+                          className="text-yellow-600 hover:text-yellow-500"
+                          title="Download Bill"
+                        >
+                          <Download className="h-5 w-5" />
                         </button>
                         <button
                           onClick={() => navigate(`/edit-bill/${bill._id}`)}

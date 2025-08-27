@@ -99,6 +99,7 @@ export const createBill =
       dispatch(fetchBills());
     } catch (err) {
       Swal.close();
+      console.error(err);
       dispatch(failure(err.response?.data?.message || "Create failed"));
       toast.error(err.response?.data?.message || "Create failed");
     }
@@ -160,6 +161,7 @@ export const updateBill =
       navigate("/bills");
     } catch (err) {
       Swal.close();
+      console.error(err);
       dispatch(failure(err.response?.data?.message || "Update failed"));
       toast.error(err.response?.data?.message || "Update failed");
     }
@@ -225,6 +227,211 @@ export const downloadBill = (id) => async (dispatch, getState) => {
     link.remove();
     dispatch(createBillSuccess());
     toast.success("Bill downloaded successfully!");
+  } catch (error) {
+    Swal.close();
+    dispatch(failure(error.response?.data?.message || error.message));
+  }
+};
+export const downloadBankDetailForm = () => async (dispatch, getState) => {
+  dispatch(request());
+  Swal.fire({
+    title: "Preparing your Bank Detail Form...",
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading(),
+  });
+
+  try {
+    const token =
+      getState().authentication.token || localStorage.getItem("token");
+
+    const response = await axios.get(
+      `${import.meta.env.VITE_BACKEND_API}/bill/download/bank-detail-form`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: "blob",
+      }
+    );
+
+    Swal.close();
+
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `Bank-Detail-Form.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    dispatch(createBillSuccess());
+    toast.success("Bill downloaded successfully!");
+  } catch (error) {
+    Swal.close();
+    dispatch(failure(error.response?.data?.message || error.message));
+  }
+};
+export const downloadPersonBill = (id) => async (dispatch, getState) => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "Download Person Bill for Each Person You Get Separate Bill!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, Proceed!",
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      dispatch(request());
+      Swal.fire({
+        title: "Preparing Bills for individual...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      try {
+        const token =
+          getState().authentication.token || localStorage.getItem("token");
+
+        const response = await axios.get(
+          `${
+            import.meta.env.VITE_BACKEND_API
+          }/bill/download/personalBill/${id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            responseType: "blob",
+          }
+        );
+
+        Swal.close();
+
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `Bill-individual-Person-${id}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        dispatch(createBillSuccess());
+        toast.success("Bill downloaded successfully!");
+      } catch (error) {
+        Swal.close();
+        dispatch(failure(error.response?.data?.message || error.message));
+      }
+    }
+  });
+};
+export const mailPersonalBillsToSelf = (id) => async (dispatch, getState) => {
+  dispatch(request());
+  Swal.fire({
+    title: "Wait!!, Sending Bill to Your Mail...",
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading(),
+  });
+  try {
+    const token =
+      getState().authentication.token || localStorage.getItem("token");
+
+    const response = await axios.get(
+      `${import.meta.env.VITE_BACKEND_API}/bill/mail/personalBill/${id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: "blob",
+      }
+    );
+    dispatch(createBillSuccess());
+
+    toast.success("Bill Mailed successfully!, Check Your Mail");
+    Swal.close();
+    Swal.fire("Success!", "Bill mailed to your registered email.", "success");
+  } catch (error) {
+    Swal.close();
+    dispatch(failure(error.response?.data?.message || error.message));
+  }
+};
+export const mailPersonalBillsToOther = (id, email) => async (dispatch, getState) => {
+  dispatch(request());
+  Swal.fire({
+    title: `Sending Bill To : ${email}`,
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading(),
+  });
+
+  try {
+    const token =
+      getState().authentication.token || localStorage.getItem("token");
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_API}/bill/mail/personalBill/other/${id}`,
+      { email },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    dispatch(createBillSuccess());
+    Swal.close();
+    Swal.fire("Success!", `Bill mailed to ${email}`, "success");
+    toast.success(`Bill is Sent To: ${email}`);
+  } catch (error) {
+    Swal.close();
+    dispatch(failure(error.response?.data?.message || error.message));
+  }
+};
+
+export const mailMainBillToSelf = (id) => async (dispatch, getState) => {
+  dispatch(request());
+  Swal.fire({
+    title: "Wait!!, Sending Bill to Your Mail...",
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading(),
+  });
+  try {
+    const token =
+      getState().authentication.token || localStorage.getItem("token");
+
+    const response = await axios.get(
+      `${import.meta.env.VITE_BACKEND_API}/bill/mail/mainBill/${id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: "blob",
+      }
+    );
+    dispatch(createBillSuccess());
+
+    toast.success("Bill Mailed successfully!, Check Your Mail");
+    Swal.close();
+    Swal.fire("Success!", "Bill mailed to your registered email.", "success");
+  } catch (error) {
+    Swal.close();
+    dispatch(failure(error.response?.data?.message || error.message));
+  }
+};
+export const mailMainBillToOther = (id, email) => async (dispatch, getState) => {
+  dispatch(request());
+  Swal.fire({
+    title: `Sending Bill To : ${email}`,
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading(),
+  });
+
+  try {
+    const token =
+      getState().authentication.token || localStorage.getItem("token");
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_API}/bill/mail/mainBill/other/${id}`,
+      { email },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    dispatch(createBillSuccess());
+    Swal.close();
+    Swal.fire("Success!", `Bill mailed to ${email}`, "success");
+    toast.success(`Bill is Sent To: ${email}`);
   } catch (error) {
     Swal.close();
     dispatch(failure(error.response?.data?.message || error.message));

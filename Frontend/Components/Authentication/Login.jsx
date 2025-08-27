@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +8,6 @@ import {
   verifyOtp,
   otpSent,
 } from "../../AllStateContainer/Authentication/AuthenticationSlice";
-import { useEffect } from "react";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -17,6 +16,7 @@ export default function Login() {
   const isAuthenticated = useSelector(
     (state) => state.authentication.isAuthenticated
   );
+
   const [method, setMethod] = useState("email-password");
   const [form, setForm] = useState({
     email: "",
@@ -31,6 +31,7 @@ export default function Login() {
     }
     dispatch(otpSent(email));
   };
+
   function onChange(e) {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
@@ -47,15 +48,27 @@ export default function Login() {
       await dispatch(verifyOtp(form.email, form.otp, navigate));
     }
   }
+
   useEffect(() => {
     if (isAuthenticated === true) {
       navigate("/");
     }
   }, [isAuthenticated]);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow p-6">
-        <h1 className="text-xl font-semibold text-center mb-4">Login</h1>
+        {/* Logo & Heading */}
+        <div className="flex flex-col items-center mb-6">
+          <img
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiDX-TI_GWDRoSUoutAJU6HDoAwjH9sPY_PUd2yOYyYNdY6g6un5KNinkcCQmHdmuqIPg&usqp=CAU"
+            alt="College Logo"
+            className="w-20 h-20 mb-3"
+          />
+          <h1 className="text-2xl font-bold text-slate-900">
+            Staff Remuneration Login
+          </h1>
+        </div>
 
         {/* Tabs */}
         <div className="flex border-b mb-4">
@@ -156,7 +169,7 @@ export default function Login() {
           >
             {loading ? "Logging in..." : "Login"}
           </button>
-          {error && <p> Error: {error}</p>}
+          {error && <p className="text-red-600 text-sm">Error: {error}</p>}
         </form>
       </div>
     </div>
