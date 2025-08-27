@@ -151,6 +151,7 @@ exports.sendOtp = async (req, res) => {
 
     res.status(200).json({ success: true, message: "OTP sent to email" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -177,6 +178,7 @@ exports.verifyOtpAndReset = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Password updated successfully" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false, message: err.message });
   }
 };
