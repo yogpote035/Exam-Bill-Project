@@ -12,6 +12,9 @@ import CreateBIll from "../Components/Bill/CreateBill";
 import AllBills from "../Components/Bill/AllBills";
 import UpdateBill from "../Components/Bill/UpdateBill";
 import ViewBill from "../Components/Bill/ViewBill";
+import ViewProfile from "../Components/Profile/ViewProfile";
+import EditProfile from "../Components/Profile/EditProfile";
+import ForgotPassword from "../Components/Profile/ForgotPassword";
 function App() {
   return (
     <>
@@ -24,7 +27,14 @@ function App() {
         }}
       />
       <Routes>
-        <Route path="/" element={<ProtectedRoutes><AllBills /></ProtectedRoutes>} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoutes>
+              <AllBills />
+            </ProtectedRoutes>
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         {/* create bill */}
@@ -45,7 +55,6 @@ function App() {
             </ProtectedRoutes>
           }
         />
-
         {/* get all bill */}
         <Route
           path="/bills"
@@ -64,7 +73,31 @@ function App() {
             </ProtectedRoutes>
           }
         />
-
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoutes>
+              <ViewProfile />
+            </ProtectedRoutes>
+          }
+        />
+        <Route path="/forgot-password" element={<ForgotPassword />} />{" "}
+        <Route
+          path="/change-password"
+          element={
+            <ProtectedRoutes>
+              <ForgotPassword />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="/edit-profile"
+          element={
+            <ProtectedRoutes>
+              <EditProfile />
+            </ProtectedRoutes>
+          }
+        />
         <Route
           path="*"
           element={

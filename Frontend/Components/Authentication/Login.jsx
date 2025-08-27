@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   loginEmailPassword,
   loginNumberPassword,
@@ -169,6 +169,7 @@ export default function Login() {
           >
             {loading ? "Logging in..." : "Login"}
           </button>
+          <Link to={"/forgot-password"} className="text-indigo-500 text-sm hover:underline">Forgot Password</Link>
           {error && <p className="text-red-600 text-sm">Error: {error}</p>}
         </form>
       </div>

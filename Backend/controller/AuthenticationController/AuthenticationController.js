@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const UserModel = require("../../Model/AuthenticationModel");
+const UserModel = require("../../Model/UserModel");
 const OtpModel = require("../../Model/OtpModel");
 const CreateToken = require("../../Middleware/CreateToken");
 const nodemailer = require("nodemailer");

@@ -47,6 +47,9 @@ app.use("/api/authentication", require("./route/AuthenticationRoute/index"));
 
 // for Bill CRUD
 app.use("/api/bill", require("./route/BillRoutes/index"));
+
+// for Profile UD
+app.use("/api/profile", require("./route/ProfileRoute/ProfileRoutes"));
 // Server Listening
 app.listen(PORT, () => {
   console.log(`Server listening on PORT ${PORT} ⛳`);

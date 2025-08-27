@@ -141,64 +141,81 @@ export default function ViewBill() {
   };
   return (
     <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <button
-          onClick={() => navigate(-1)}
-          className="text-blue-600 hover:text-blue-800 flex items-center"
-        >
-          <ArrowLeft className="h-5 w-5 mr-2" />
-          Back to Bills
-        </button>
-        <div className="flex space-x-2">
+      <div className="flex flex-col space-y-4 mb-6">
+        {/* Header Section */}
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-800">Bill Details</h1>
           <button
             onClick={() => navigate(`/edit-bill/${id}`)}
-            className="bg-gradient-to-r from-green-500  to-green-600 hover:from-green-600 hover:to-green-500 text-white px-4 py-2 rounded flex items-center"
+            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-500 text-white px-4 py-2 rounded-lg flex items-center shadow-md hover:shadow-lg transition-all duration-200"
           >
             <Edit className="h-5 w-5 mr-2" />
             Edit Bill
           </button>
-          {/* <button
-            onClick={handlePrint}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center"
-          >
-            <Printer className="h-5 w-5 mr-2" />
-            Print Bill
-          </button> */}
-          <button
-            onClick={handlePersonalMailBill}
-            className="bg-gradient-to-r from-orange-400  to-orange-600 hover:from-orange-600 hover:to-orange-400 text-white px-4 py-2 rounded flex items-center"
-          >
-            <BiLogoGmail className="h-5 w-5 mr-2 text-white hover:text-gray-600" />
-            Mail Personal Bills
-          </button>
-          <button
-            onClick={handleMainMailBill}
-            className="bg-gradient-to-r from-amber-500  to-orange-600 hover:from-orange-600 hover:to-amber-500 text-white px-4 py-2 rounded flex items-center"
-          >
-            <BiLogoGmail className="h-5 w-5 mr-2 text-white hover:text-black" />
-            Mail Bill
-          </button>
-          <button
-            onClick={() => dispatch(downloadBill(currentBill._id))}
-            className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-indigo-600 hover:to-green-500 text-white px-4 py-2 rounded flex items-center"
-          >
-            <Download className="h-5 w-5 mr-2" />
-            Download Bill(Main)
-          </button>{" "}
-          <button
-            onClick={() => dispatch(downloadPersonBill(currentBill._id))}
-            className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-green-600 hover:to-blue-500 text-white px-4 py-2 rounded flex items-center"
-          >
-            <Download className="h-5 w-5 mr-2" />
-            Download Bill(Personal Bills)
-          </button>{" "} 
-          <button
-            onClick={() => dispatch(downloadBankDetailForm())}
-            className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-green-600 hover:to-blue-500 text-white px-4 py-2 rounded flex items-center"
-          >
-            <Download className="h-5 w-5 mr-2" />
-            Download Bank Detail Form
-          </button>{" "}
+        </div>
+
+        {/* Button Groups */}
+        <div className="flex flex-wrap gap-3">
+          {/* Email Buttons */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              onClick={() => navigate(-1)}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-500 text-white px-4 py-2 rounded-lg flex items-center shadow-md hover:shadow-lg transition-all duration-200"
+            >
+              <ArrowLeft className="h-5 w-5 mr-2" />
+              Back
+            </button>
+            <button
+              onClick={handlePersonalMailBill}
+              className="bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-600 hover:to-orange-400 text-white px-4 py-2 rounded-lg flex items-center shadow-md hover:shadow-lg transition-all duration-200"
+            >
+              <BiLogoGmail className="h-5 w-5 mr-2" />
+              Personal Bills
+            </button>
+            <button
+              onClick={handleMainMailBill}
+              className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-orange-600 hover:to-amber-500 text-white px-4 py-2 rounded-lg flex items-center shadow-md hover:shadow-lg transition-all duration-200"
+            >
+              <BiLogoGmail className="h-5 w-5 mr-2" />
+              Main Bill
+            </button>
+          </div>
+
+          {/* Download Buttons */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              onClick={() => dispatch(downloadBill(currentBill._id))}
+              className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-blue-700 hover:to-green-600 text-white px-4 py-2 rounded-lg flex items-center shadow-md hover:shadow-lg transition-all duration-200"
+            >
+              <Download className="h-5 w-5 mr-2" />
+              Main Bill
+            </button>
+            <button
+              onClick={() => dispatch(downloadPersonBill(currentBill._id))}
+              className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-green-700 hover:to-blue-600 text-white px-4 py-2 rounded-lg flex items-center shadow-md hover:shadow-lg transition-all duration-200"
+            >
+              <Download className="h-5 w-5 mr-2" />
+              Personal Bills
+            </button>
+            <button
+              onClick={() => dispatch(downloadBankDetailForm())}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-indigo-700 hover:to-purple-600 text-white px-4 py-2 rounded-lg flex items-center shadow-md hover:shadow-lg transition-all duration-200"
+            >
+              <Download className="h-5 w-5 mr-2" />
+              Bank Form
+            </button>
+          </div>
+
+          {/* Additional Actions */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              onClick={() => window.print()}
+              className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white px-4 py-2 rounded-lg flex items-center shadow-md hover:shadow-lg transition-all duration-200"
+            >
+              <Printer className="h-5 w-5 mr-2" />
+              Print (Local)
+            </button>
+          </div>
         </div>
       </div>
 
