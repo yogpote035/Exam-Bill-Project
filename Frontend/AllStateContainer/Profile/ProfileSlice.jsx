@@ -85,6 +85,7 @@ export const updateProfile =
       dispatch(success(data));
       toast.success("Profile updated successfully!");
       navigate("/profile");
+      dispatch(getProfile());
     } catch (err) {
       Swal.close();
       const message = err.response?.data?.message || "Update Profile failed";
@@ -113,7 +114,7 @@ export const sendOtp = (email) => async (dispatch) => {
     return true;
   } catch (err) {
     Swal.close();
-    
+
     dispatch(failure(err.response?.data?.message || err.message));
     Swal.fire("Error", err.response?.data?.message || err.message, "error");
     return false;
@@ -140,12 +141,17 @@ export const verifyOtpAndReset =
       dispatch(success(data.message));
       Swal.close();
       Swal.fire("Success", data.message, "success");
+      // AFTER SUCCESS
       if (!token) {
         navigate("/login");
+      } else {
+        navigate(-1);
       }
+      return true;
     } catch (err) {
       Swal.close();
       dispatch(failure(err.response?.data?.message || err.message));
       Swal.fire("Error", err.response?.data?.message || err.message, "error");
+      return false;
     }
   };

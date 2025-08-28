@@ -4,23 +4,22 @@ import {
   getProfile,
   updateProfile,
 } from "../../AllStateContainer/Profile/ProfileSlice";
-import {
-  Camera,
-  Save,
-  ArrowLeft,
-  Trash2,
-  User,
-  Loader,
-} from "lucide-react";
+import { Camera, Save, ArrowLeft, Trash2, User, Loader } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const EditProfile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { profile: user, loading, error } = useSelector(
-    (state) => state.profile
-  );
+  const {
+    profile: user,
+    loading,
+    error,
+  } = useSelector((state) => state.profile);
+
+  const role =
+    useSelector((state) => state.authentication.role) ||
+    localStorage.getItem("role");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -29,7 +28,7 @@ const EditProfile = () => {
     department: "",
     teacherId: "",
   });
-
+  const [profileImage, setProfileImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageLoading, setImageLoading] = useState(false);
   const [uploadError, setUploadError] = useState("");
@@ -55,8 +54,23 @@ const EditProfile = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("File size must be less than 5MB");
+      return;
+    }
+
+    setUploadError("");
+    setProfileImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     Swal.fire({
       title: "Are you sure?",
       text: "Do you want to save the changes to your profile?",
@@ -66,7 +80,20 @@ const EditProfile = () => {
       cancelButtonText: "Cancel",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await dispatch(updateProfile(formData, navigate));
+        const fd = new FormData();
+        fd.append("name", formData.name);
+        fd.append("mobileNumber", formData.mobileNumber);
+        fd.append("email", formData.email);
+
+        if (role === "teacher") {
+          fd.append("department", formData.department);
+          fd.append("teacherId", formData.teacherId);
+          if (profileImage) {
+            fd.append("profileImage", profileImage);
+          }
+        }
+
+        await dispatch(updateProfile(fd, navigate));
       }
     });
   };
@@ -138,7 +165,7 @@ const EditProfile = () => {
                     id="profile-image"
                     type="file"
                     accept="image/*"
-                    onChange={(e) => console.log("Handle upload here")}
+                    onChange={handleImageChange}
                     className="hidden"
                     disabled={imageLoading}
                   />
@@ -147,7 +174,10 @@ const EditProfile = () => {
                 {imagePreview && !imageLoading && (
                   <button
                     type="button"
-                    onClick={() => setImagePreview(null)}
+                    onClick={() => {
+                      setProfileImage(null);
+                      setImagePreview(null);
+                    }}
                     className="bg-red-600 text-white p-3 rounded-full shadow-md hover:bg-red-700 transition-colors"
                   >
                     <Trash2 className="h-5 w-5" />
@@ -203,10 +233,9 @@ const EditProfile = () => {
                 required
               />
             </div>
-            
 
             {/* Department (teachers only) */}
-            {formData.role === "teacher" && (
+            {role === "teacher" && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Department *
@@ -235,7 +264,7 @@ const EditProfile = () => {
             )}
 
             {/* Teacher ID (teachers only) */}
-            {formData.role === "teacher" && (
+            {role === "teacher" && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Teacher ID *

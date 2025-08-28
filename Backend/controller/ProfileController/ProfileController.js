@@ -1,6 +1,6 @@
 const UserModel = require("../../Model/UserModel");
 const bcrypt = require("bcryptjs");
-const { uploadToCloudinary } = require("../../Middleware/uploadToCloudinary");
+const uploadToCloudinary = require("../../Middleware/uploadToCloudinary");
 const nodemailer = require("nodemailer");
 const OtpModel = require("../../Model/OtpModel");
 

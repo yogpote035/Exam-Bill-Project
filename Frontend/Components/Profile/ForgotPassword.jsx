@@ -23,12 +23,16 @@ const ForgotPassword = () => {
   };
 
   const handleResetPassword = () => {
-    dispatch(verifyOtpAndReset(email, otp, newPassword, navigate)).then(() => {
-      setStep(1);
-      setEmail("");
-      setOtp("");
-      setNewPassword("");
-    });
+    dispatch(verifyOtpAndReset(email, otp, newPassword, navigate)).then(
+      (result) => {
+        if (result === fa) {
+          setStep(1);
+          setEmail("");
+          setOtp("");
+          setNewPassword("");
+        }
+      }
+    );
   };
 
   return (
