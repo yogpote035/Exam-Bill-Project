@@ -172,8 +172,18 @@ export const updateBill =
     } catch (err) {
       Swal.close();
       console.error(err);
-      dispatch(failure(err.response?.data?.message || "Update failed"));
-      toast.error(err.response?.data?.message || "Update failed");
+      dispatch(
+        failure(
+          err.response?.data?.message ||
+            err.response?.data?.errors[0]?.msg ||
+            "Update failed"
+        )
+      );
+      toast.error(
+        err.response?.data?.message ||
+          err.response?.data?.errors[0]?.msg ||
+          "Update failed"
+      );
     }
   };
 
