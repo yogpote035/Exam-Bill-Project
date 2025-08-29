@@ -18,21 +18,29 @@ const ForgotPassword = () => {
 
   const handleSendOtp = () => {
     dispatch(sendOtp(email)).then((result) => {
-      result === true ? setStep(2) : "";
+      if (result === true) {
+        setStep(2);
+      }
+      // If false, stay on current step (don't reset form)
     });
   };
 
   const handleResetPassword = () => {
-    dispatch(verifyOtpAndReset(email, otp, newPassword, navigate)).then(
+    dispatch(verifyOtpAndReset(email, otp.trim(), newPassword, navigate)).then(
       (result) => {
-        if (result === fa) {
-          setStep(1);
-          setEmail("");
-          setOtp("");
-          setNewPassword("");
+        if (result === false) {
+          // setOtp("");
+          // setNewPassword("");
         }
+        // If true, the navigation will happen
       }
     );
+  };
+
+  // Add a function to go back to step 1 if needed
+  const handleBackToEmail = () => {
+    setStep(1);
+    // Keep the email field filled for convenience
   };
 
   return (
@@ -62,6 +70,15 @@ const ForgotPassword = () => {
           <h2 className="text-2xl font-bold mb-4">
             Verify OTP & Reset Password
           </h2>
+          <p className="text-sm text-gray-600 mb-4">
+            OTP sent to: {email}
+            <button
+              onClick={handleBackToEmail}
+              className="ml-2 text-blue-600 hover:text-blue-800 text-xs"
+            >
+              Change email
+            </button>
+          </p>
           <input
             type="text"
             placeholder="Enter OTP"

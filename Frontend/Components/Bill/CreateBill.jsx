@@ -185,7 +185,6 @@ export default function CreateBill() {
       examEndTime: new Date(data.examEndTime),
     };
 
-    console.log("data from Create Bill: ", transformedData);
     dispatch(createBill(transformedData,navigate));
   };
 

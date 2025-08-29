@@ -100,8 +100,18 @@ export const createBill =
     } catch (err) {
       Swal.close();
       console.error(err);
-      dispatch(failure(err.response?.data?.message || "Create failed"));
-      toast.error(err.response?.data?.message || "Create failed");
+      dispatch(
+        failure(
+          err.response?.data?.message ||
+            err.response?.data?.errors[0]?.msg ||
+            "Create failed"
+        )
+      );
+      toast.error(
+        err.response?.data?.message ||
+          err.response?.data?.errors[0]?.msg ||
+          "Create failed"
+      );
     }
   };
 
@@ -350,35 +360,38 @@ export const mailPersonalBillsToSelf = (id) => async (dispatch, getState) => {
     dispatch(failure(error.response?.data?.message || error.message));
   }
 };
-export const mailPersonalBillsToOther = (id, email) => async (dispatch, getState) => {
-  dispatch(request());
-  Swal.fire({
-    title: `Sending Bill To : ${email}`,
-    allowOutsideClick: false,
-    didOpen: () => Swal.showLoading(),
-  });
+export const mailPersonalBillsToOther =
+  (id, email) => async (dispatch, getState) => {
+    dispatch(request());
+    Swal.fire({
+      title: `Sending Bill To : ${email}`,
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
 
-  try {
-    const token =
-      getState().authentication.token || localStorage.getItem("token");
+    try {
+      const token =
+        getState().authentication.token || localStorage.getItem("token");
 
-    const response = await axios.post(
-      `${import.meta.env.VITE_BACKEND_API}/bill/mail/personalBill/other/${id}`,
-      { email },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+      const response = await axios.post(
+        `${
+          import.meta.env.VITE_BACKEND_API
+        }/bill/mail/personalBill/other/${id}`,
+        { email },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-    dispatch(createBillSuccess());
-    Swal.close();
-    Swal.fire("Success!", `Bill mailed to ${email}`, "success");
-    toast.success(`Bill is Sent To: ${email}`);
-  } catch (error) {
-    Swal.close();
-    dispatch(failure(error.response?.data?.message || error.message));
-  }
-};
+      dispatch(createBillSuccess());
+      Swal.close();
+      Swal.fire("Success!", `Bill mailed to ${email}`, "success");
+      toast.success(`Bill is Sent To: ${email}`);
+    } catch (error) {
+      Swal.close();
+      dispatch(failure(error.response?.data?.message || error.message));
+    }
+  };
 
 export const mailMainBillToSelf = (id) => async (dispatch, getState) => {
   dispatch(request());
@@ -408,32 +421,33 @@ export const mailMainBillToSelf = (id) => async (dispatch, getState) => {
     dispatch(failure(error.response?.data?.message || error.message));
   }
 };
-export const mailMainBillToOther = (id, email) => async (dispatch, getState) => {
-  dispatch(request());
-  Swal.fire({
-    title: `Sending Bill To : ${email}`,
-    allowOutsideClick: false,
-    didOpen: () => Swal.showLoading(),
-  });
+export const mailMainBillToOther =
+  (id, email) => async (dispatch, getState) => {
+    dispatch(request());
+    Swal.fire({
+      title: `Sending Bill To : ${email}`,
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
 
-  try {
-    const token =
-      getState().authentication.token || localStorage.getItem("token");
+    try {
+      const token =
+        getState().authentication.token || localStorage.getItem("token");
 
-    const response = await axios.post(
-      `${import.meta.env.VITE_BACKEND_API}/bill/mail/mainBill/other/${id}`,
-      { email },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_API}/bill/mail/mainBill/other/${id}`,
+        { email },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-    dispatch(createBillSuccess());
-    Swal.close();
-    Swal.fire("Success!", `Bill mailed to ${email}`, "success");
-    toast.success(`Bill is Sent To: ${email}`);
-  } catch (error) {
-    Swal.close();
-    dispatch(failure(error.response?.data?.message || error.message));
-  }
-};
+      dispatch(createBillSuccess());
+      Swal.close();
+      Swal.fire("Success!", `Bill mailed to ${email}`, "success");
+      toast.success(`Bill is Sent To: ${email}`);
+    } catch (error) {
+      Swal.close();
+      dispatch(failure(error.response?.data?.message || error.message));
+    }
+  };
